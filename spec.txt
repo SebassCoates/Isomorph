@@ -1,0 +1,145 @@
+
+
+ISOMORPH
+An Encryption Scheme Written in C++
+Sebastian Coates - April 6, 2017
+comp 15 project specification
+
+PROBLEM STATEMENT
+I will use “Isomorphic Permutations”* of graphs to securely encrypt and decrypt files. 
+
+USE CASES
+Use of Isomorph will be simple. Users can encrypt files, which means they will provide a file as input and will receive two files as output, the encrypted data and a key. Users can also decrypt files by providing and encrypted file and a key. The program will output the decrypted file in this case. 
+
+
+ASSUMPTIONS AND CONSTRAINTS
+The primary assumption is that there is at least enough available memory to save the encrypted or decrypted output file. The amount of space needed is proportional to the size of the file being encrypted or decrypted. It will not be assumed that the user has unlimited space, but a reasonable amount - perhaps 5x the size of the file when encrypting and 1x the size of the ciphertext when decrypting. 
+In theory, the size of the key file will grow at a non-linear rate proportionally to the size of the plaintext. It is assumed that this will not be a significant limiting factor at a reasonable scale.
+User input is constrained to .txt files. File output will be constrained to .txt files. 
+If the user provides an invalid key, the program may fail or may decrypt the file incorrectly. If the key is formatted incorrectly or relates a different number of nodes than the nodes present in the ciphertext, the user will be alerted that the key was incorrect. If the key happened to be formatted correctly and have the correct number of nodes, it is up to the user to verify that their ciphertext was decrypted properly. 
+
+PROJECT MINIMUM AND STRETCH GOALS
+A minimum goal for this program would be the successful encryption/decryption of small text files using the encryption scheme specified at the end of this document. 
+A stretch goal for this program would be the successful encryption/decryption of large text files. Additionally, I would add functionality to allow the program to attempt to brute force decrypt ciphertext. I could then do some statistical analysis to determine the minimum number of permutations necessary to ensure the security of files of various sizes. This will optimize the speed of the encryption process.  
+
+ARCHITECTURE
+The three main components of this program are encryption, decryption, and handling user input. Proper handling of user input will dictate whether to use encryption or decryption. The following structure follows: 
+•	Encryption.h, Encryption.cpp (encryption class)
+•	Decryption.h, Decryption.cpp (decryption class)
+•	main.cpp (to handle input, drive encryption and decryption components)
+Since I’m dealing with graph isomorphism, I will also need to use a graph data structure (in all of the above classes and main). Graphs will be represented by a matrix (2D array). This adds the following files to the mix:
+•	Graph.h, Graph.cpp
+
+For the all-important encryption/decryption algorithms, see the last section of the document. That section encompasses all necessary algorithms. 
+
+TIMELINE
+•	By April 7, 2017 (Friday)
+o	Email spec to the TAs
+•	April 7, 2017 (Friday)
+o	Focus on IDHack, restrain self from implementing project during event. 
+•	April 8, 2017 (Saturday)
+o	Still IDHack
+o	SLEEP
+•	April 9, 2017 (Sunday)
+o	Write skeleton files
+o	Begin implementing graph class
+•	By April 11, 2017 (Tuesday)
+o	Finish implementing and testing graph class
+o	Schedule Check-in with TAs. 
+•	April 11, 2017 (Tuesday)
+o	Implement permutation/encryption algorithm
+•	April 14, 2017 (Friday)
+o	Begin implementing decryption
+•	By April 16, 2017 (Sunday)
+o	Finish implementing decryption
+o	Begin debugging full program
+o	Cry in Halligan
+•	April 16, 2018 (Sunday)
+o	If ahead of schedule, begin to implement brute force decryption and optimize algorithms
+•	By April 20, 2017 (Thursday)
+o	PROVIDE WORKING FINAL PROJECT
+•	April 20, 2017 (Thursday)
+o	Begin to prepare presentation! 
+
+Testing
+The first component to implement and test is the graph structure. I will make sure it is able to convert a file to a graph and convert a graph to a text file. 
+From there, I must ensure the graph can successfully permute data (which is how the graph encrypts data).
+Then, I will implement the decryption, using only 1 permutation to encrypt. I will ensure this works for small files (<10 characters). Then I will test more complicated files. Of course, to verify successful encryption/decryption I will make sure the plaintext input is the same as the decrypted ciphertext output. 
+Once the basic scheme is working, I will increase the number of permutations, and allow the permutations to be randomly generated. Again, I will ensure this works for small files and then move to more complicated files. 
+At this point I will have exceeded my minimum goal. From here, though, I can write and test a brute force algorithm for decryption. This will allow me to refine the efficiency of the encryption by optimizing the number of permutations necessary. This will also serve as additional testing - it will allow me to test the functionality of my encryption in the time complexity of the brute force method. 
+
+ENCRYPTION SCHEME
+
+I’ll start the explanation of the encryption with a 4-node graph: 
+
+
+
+
+
+
+
+
+
+This graph can be depicted by the following matrix. Note: label in graph above corresponds to ascending row/column index starting from 1. 
+0
+1
+1
+1
+0
+0
+1
+1
+0
+1
+1
+0
+0
+0
+1
+1
+
+Reading this as blocks of bytes (left-right, top-down) this represents my initials (sc) in ASCII. 
+Now, I’ll take the graph and swap the labels of node 1 and node 4. Let’s call this a permutation. This permutation is isomorphic with the original graph, obviously, as only the labels have changed. 
+
+
+
+
+
+
+
+
+
+In account for this swap of labels in the matrix, I need to swap the first and fourth row, as well as the first and fourth column. 
+1
+0
+1
+0
+0
+0
+1
+1
+0
+1
+1
+0
+1
+1
+1
+0
+
+Now, if I try to read this as a binary block of bytes I get: 10100011 and 01101110. (sc) is now (ún). You can see that because both rows and columns were swapped, the plaintext was both permuted and obfuscated. This means that there is no guarantee a character found in the ciphertext exists in the plaintext; rearranging the characters in the ciphertext will (effectively) never generate the correct plaintext. Neat!
+
+So how about decryption? Well, if I know that after the permutations, 1 and 4 were swapped, I can simply swap them back. This information is stored in the key. 
+What if I don’t have the key?
+I would have to check every possible isomorphic permutation of the graph until I get some discernable plaintext. How many permutations would this be?
+Lets say we have two sets, A and B.
+A = {1,2,3,4} and B = {a,b,c,d}
+If I tell you there is a specific bijection from A to B that represents the key, how many do you have to list before you guarantee you have listed the key? To force this occurrence, by the pigeonhole principle, you must list ALL bijections from A to B. There are |A|! (or if you prefer, |B|!) bijections from A to B. 
+So, if the number of nodes is N, the time complexity of decryption by this brute force method is O(N!). Of course, if you have the key, you simply swap N elements, so the time to decrypt with key is O(N). 
+Well, can’t it be faster than O(N!) to decrypt a file? Sure. For example, if a graph’s matrix consists of all 0s or all 1s, it is impossible to permute and generate a distinct isomorphic graph. That is to say, any rows that are equal and symmetric width-wise and height-wise cannot actually have their labels swapped. With distributions of 0s and 1s as found in a normal file though, this is statistically insignificant.  
+It is also possible that after some series of random permutations, the graph has returned to its original state. This should be checked after encryption to ensure a non-trivial decryption.  
+
+
+Cover photo image courtesy of: 
+http://odu.edu/compsci
+
