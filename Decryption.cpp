@@ -76,7 +76,7 @@ void Decryption::readKey(Graph *filedata)
 
 	string compressed_pad = keyfile_text.substr(0, end_of_key_index);
 
-	string compressed_permutation = 
+	string com_permutation = 
 	keyfile_text.substr(end_of_key_index + 1, keyfile_text.length());
 
 	string compressed_binary  = comp.decompressBinary(compressed_pad);
@@ -85,21 +85,19 @@ void Decryption::readKey(Graph *filedata)
 	}
 	filedata->setPadText(compressed_binary);
 
-	string perm_text = /*comp.decompressDecimal*/(compressed_permutation);
 	vector <int> permutation;
-	while(perm_text.size() > 0){
-		end_of_key_index = perm_text.find(' ');
-		string integer = perm_text.substr(0, end_of_key_index);
-		if (integer.size() > 0){
-			permutation.push_back(stoi(integer));
+	while(com_permutation.size() > 0){
+		end_of_key_index = com_permutation.find(flag);
+		string value = com_permutation.substr(0, end_of_key_index);
+		if (value.size() > 0){
+			permutation.push_back(comp.decompressDecimal(value));
 		}
-		perm_text.erase(0, end_of_key_index + 1);
+		com_permutation.erase(0, end_of_key_index + 1);
 	}
 	
 	for (int i = permutation.size() - 1; i > 0; i--){
 		filedata->permute(permutation[i], permutation[i-1]);
 	}
-	
 }
 
 /* Purpose: Output decrypted graph to file called "decrypted.txt"

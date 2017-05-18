@@ -66,8 +66,20 @@ string Compressor::compressBinary(string binary){
  *
  */ 
 string Compressor::compressDecimal(int decimal){
-	(void) decimal;
-	return "";
+	string to_return = "";
+	
+	int divisor = 128;
+
+	while (decimal > 0){
+		string add_front = "";
+		add_front += (char) (decimal % divisor);
+
+		to_return = add_front + to_return; 
+
+		decimal /= divisor;
+	}
+
+	return to_return;
 }
 
 /* Purpose: Decmpress base 128 string to binary number
@@ -75,9 +87,11 @@ string Compressor::compressDecimal(int decimal){
  * Returns: int - decompressed integer
  *
  * ADDITIONAL INFORMATION:
- * 		-Extra zeroes likely exist at front of decompressed binary,
+ * 		-Extra zeroes often exist at front of decompressed binary,
  * 		ensure it is same length as the original binary by erasing
  * 		the characters starting at 0 until length is same.
+ * 		(This occurs when compressing string of bits with a length
+ 		that is not a multiple of 8)
  */ 
 string Compressor::decompressBinary(string charbase){
 	string to_return;
@@ -95,12 +109,24 @@ string Compressor::decompressBinary(string charbase){
  *
  */ 
 int Compressor::decompressDecimal(string charbase){
-	(void) charbase;
-	return 5;
+	int decimal = 0;
+
+	for (int i = (int) charbase.size() - 1; i >= 0; i--){
+		int integerAtIndex = charbase.at(i);
+		decimal += integerAtIndex * pow(128, charbase.size() - 1 - i);
+	}
+	
+	return decimal;
 }
 
 
 /*********************PRIVATE FUNCTIONS*********************/
+
+/* Purpose: Convert character to string of bits
+ * Parameters: int - ascii value of character
+ * Returns: string - string of bits representing char
+ *
+ */ 
 string Compressor::charToBinary(int to_convert){
 	string binary = "";
 
