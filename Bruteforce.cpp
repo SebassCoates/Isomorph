@@ -5,7 +5,7 @@
  *  Bruteforce.cpp
  *  Complete Bruteforce Main 
  *  Modified By (UTLN):scoate02
- *           On       :April 16, 2017
+ *           On       :May 18, 2017
  *  
  *
  *  This is the main implmementation for my bruteforce decrypted process. This
@@ -27,9 +27,10 @@ using namespace std;
 bool checkPermutations(string, string);
 string nextLex(string);
 bool permuteGraph(Graph *, Graph *, string);
-void nextGraphPermutation(vector <int> *);
+int nextGraphPermutation(int, int, vector <int> *, vector <int> *);
 void printVector(vector <int> *);
 void swapLabels(Graph *, vector <int> *);
+void reswapLabels(Graph *, vector <int> *);
 
 int main(int argc, char* argv[])
 {
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
 
 	hide_cursor();
 	screen_clear();
-	cerr << "Beginning simulation of bruteforce decryption" << endl;
+	cerr << "Beginning bruteforce decryption process" << endl;
 	usleep(2000000);
 	cerr << "Starting in..." << endl;
 	usleep(1000000);
@@ -52,13 +53,12 @@ int main(int argc, char* argv[])
 	usleep(100000);
 
 	if (checkPermutations((string) argv[1], (string) argv[2])){
-		cerr << "Successfully done decrypting" << endl;
+		cerr << "Successfully decrypted" << endl;
 	}
 	else{
-		//cerr << "Not same file?" << endl;
+		cerr << "Not same file - Decryption Failed!" << endl;
 	}
 	
-	cerr << "Done checking all permutations!" << endl;
 	return 0;
 }
 
@@ -81,7 +81,6 @@ bool checkPermutations(string cipherfile, string plainfile)
 		flag.push_back('1');
 	}
 
-	cerr << "pad: " << pad_permutation << endl;
 	bool done_decrypting = permuteGraph(&plain, &cipher, pad_permutation);
 	if (done_decrypting){
 		return true;
@@ -134,50 +133,97 @@ bool permuteGraph(Graph *plain, Graph *cipher, string pad)
 		label_flag.push_back(cipher->size() - 1 - i);
 	}
 	
-	/*first scheme is identity permutation and has already been checked*/
-	/*Go through all other permutations of graph*/
+	swapLabels(cipher, &label_scheme);
+
+	if (*plain == *cipher){
+		return true;
+	}
+	else{
+		reswapLabels(cipher, &label_scheme); /*fix graph*/
+	}
+
+	int index = 0;
+	int flag = 0; 
+	vector <int> c;
 	while (label_scheme != label_flag){
-		nextGraphPermutation(&label_scheme);
+		flag = nextGraphPermutation(index, flag, &label_scheme, &c);
+		if (flag == 2){
+			index++;
+		}
+		if (flag == 3){
+			index = 0;
+		}
+		if (flag == 4){
+			break;
+		}
+		
 		screen_clear();
-		//cerr << "Pad: " << pad << endl;
+		cerr << "Pad: " << pad << endl;
 		cerr << "Permutation: "; printVector(&label_scheme);
 		cerr << endl;
-		
+	
 		swapLabels(cipher, &label_scheme);
 
 		if (*plain == *cipher){
 			return true;
 		}
 		else{
-			swapLabels(cipher, &label_scheme); /*fix graph*/
+			reswapLabels(cipher, &label_scheme); /*fix graph*/
 		}
 	}	
 	return false;
 }
 
-/* Purpose: Reorder vector to represent next lexographic arrangement of labels
+/* Purpose: Use Heap's algorithm to generate next permutation
  * Parameters: vector <int> * - representation of label pairings
  * Returns: void
  *
+ * 
+ * Additional Info: 
+ * 		HEAP'S ALGORITHM (Decomposed for repeated function calls)
+ * 		Return Flag Meanings:
+ *		0 - first call
+ *		1 - neutral 
+ * 		2 - increment index
+ * 		3 - reset index
+ * 		4 - stop
  */ 
-void nextGraphPermutation(vector <int> *label_scheme)
+int nextGraphPermutation(int index, int flag, 
+	vector <int> *label_scheme, vector <int> *c)
 {
-	/*Algorithm to find next lex
-		-Move left->right until right > left
-			-swap left + right
-	*/
+	
 
-	for (int i = ((int) label_scheme->size()) - 1; i >= 1; i--){
-		if ((*label_scheme)[i] > (*label_scheme)[i-1]){
-			int temp = (*label_scheme)[i];
-			(*label_scheme)[i] = (*label_scheme)[i-1];
-			(*label_scheme)[i-1] = temp;
-			
-			/*swapped two labels that were not already paired*/
-			if (i % 2 == 0)
-				break;
+
+	if (flag == 0){
+		for (int i = 0; i < (int) label_scheme->size(); i += 1){
+	       		c->push_back(0);
 		}
+		return 1;
 	}
+	    
+	while (index < (int) label_scheme->size()){
+	        if  ((*c)[index] < index){
+	                if (index %2 == 0) {
+	             		int temp = (*label_scheme)[0];
+	             		(*label_scheme)[0] = (*label_scheme)[index];
+	             		(*label_scheme)[index] = temp;
+	                }
+	                else{
+	                	int temp = (*label_scheme)[(*c)[index]];
+	                	(*label_scheme)[(*c)[index]] = 
+	                		(*label_scheme)[index];
+	                	(*label_scheme)[index] = temp;
+	                }
+	            	(*c)[index] += 1;
+	            	return 3;
+	        }
+	        else{
+	            	(*c)[index] = 0;
+	            	return 2;
+	        }
+	}
+
+	return 4;
 }
 
 /* Purpose: Print a vector
@@ -200,7 +246,28 @@ void printVector(vector <int> *to_print)
  */ 
 void swapLabels(Graph *cipher, vector <int> *label_scheme)
 {
-	for (int i = 0; i < ((int) label_scheme->size())/2; i+=2){
+	//cerr << "Preswap:" << endl;
+	//cipher->print();
+	//cerr << endl;
+	for (int i = 0; i < (int) label_scheme->size() - 1; i++){
 		cipher->permute((*label_scheme)[i], (*label_scheme)[i+1]);
 	}
+	//cerr << "Postswap:" << endl;
+	//cipher->print();
+	//cerr << endl;
+}
+
+/* Purpose: Repermute labels in graph using vector as representation of pairing
+ * Parameters: Graph * - ciphertext in graph, vector <int> * - labeling scheme
+ * Returns: void
+ *
+ */ 
+void reswapLabels(Graph *cipher, vector <int> *label_scheme)
+{
+	for (int i = label_scheme->size() - 1; i > 0; i--){
+		cipher->permute((*label_scheme)[i], (*label_scheme)[i-1]);
+	}
+	//cerr << "Post reswap:" << endl;
+	//cipher->print();
+	//cerr << endl;
 }

@@ -8,6 +8,11 @@ This project utilizes Graph Theory to create a new encryption scheme with a brut
 
 ****************************************************************************
 
+May 18, 2017 UPDATE:
+-Updated bruteforce encryption to account for new encryption process
+-Implemented Heap's Algorithm to efficiently generate all permutations
+-Bruteforce process now appears to work - stops when finds correct
+key/ permutation. 
 
 May 17, 2017 UPDATE:
 -Created Compressor class to handle compression of padding and permutation
