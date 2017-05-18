@@ -14,6 +14,7 @@ May 18, 2017 UPDATE:
 -Bruteforce process now appears to work - stops when finds correct
 key/ permutation. 
 
+
 May 17, 2017 UPDATE:
 -Created Compressor class to handle compression of padding and permutation
 information in key file. 
