@@ -89,14 +89,19 @@ void Decryption::readKey(Graph *filedata)
 	while(com_permutation.size() > 0){
 		end_of_key_index = com_permutation.find(flag);
 		string value = com_permutation.substr(0, end_of_key_index);
-		if (value.size() > 0){
-			permutation.push_back(comp.decompressDecimal(value));
-		}
+		permutation.push_back(comp.decompressDecimal(value));
 		com_permutation.erase(0, end_of_key_index + 1);
 	}
 	
 	for (int i = permutation.size() - 1; i > 0; i--){
 		filedata->permute(permutation[i], permutation[i-1]);
+	}
+
+	ofstream log; 
+	log.open("log2.txt");
+	for (int i = 0; i < (int) permutation.size(); i++){
+		log << permutation[i];
+		log << endl;
 	}
 }
 

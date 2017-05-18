@@ -14,7 +14,7 @@ information in key file.
 to base 128 digits represented by characters. 
 -Binary compression is implemented and seems to be functional. Reduces key 
 file size by approx 1/4. 
--Decimal compresion also added - buggy - filesizes reduces by about 1/2
+-Decimal compresion also added - now seems to be working - filesizes reduces by about 1/2 in conjunction with pad compression
 
 
 May 16, 2017 UPDATE:

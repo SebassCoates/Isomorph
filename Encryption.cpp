@@ -128,6 +128,11 @@ void Encryption::outputKey(Graph *filedata)
 		outfile << comp.compressDecimal(label_permutation[i]);
 		outfile << flag;
 	}
-
 	outfile.close();
+
+	outfile.open("log1.txt");
+	for (int i = 0; i < filedata->size(); i++){
+		outfile << label_permutation[i];
+		outfile << endl;
+	}
 }
