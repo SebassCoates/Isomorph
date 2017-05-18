@@ -4,6 +4,19 @@ course Comp 15 at Tufts University. Since its original submission, I have
 continued to develop the program. 
 This project utilizes Graph Theory to create a new encryption scheme with a brute force decryption time complexity of N(!). The program reads in a file and converts its bits into an adjacency matrix. It can encrypt the file and generate a key, or it can decrypt the file using a key. The key represents a series of permutations done to the adjacency matrix to create an isomorphic graph.
 
+****************************************************************************
+
+
+May 17, 2017 UPDATE:
+-Created Compressor class to handle compression of padding and permutation
+information in key file. 
+-Binary numbers and decimal numbers are both compressed by being converted
+to base 128 digits represented by characters. 
+-Binary compression is implemented and seems to be functional. Reduces key 
+file size by approx 1/4. 
+-Decimal compresion to be added ASAP
+
+
 May 16, 2017 UPDATE:
 Updated permutation scheme - now has true n! time complexity
 -Encryption randomly scrambles list of labels to create permutation
@@ -42,8 +55,8 @@ Goals for next update:
 			- Print ints as char instead of string?!!
 			- Allows to avoid adding whitespace delims as well!!
 
-
 ********************************************
+
 
 ORIGINAL README TEXT WITH PROJECT SUBMISSION: 	
 
