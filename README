@@ -1,3 +1,5 @@
+#ISOMORPH
+
 OVERVIEW: 
 This project was originally created as an independent final project for the
 course Comp 15 at Tufts University. Since its original submission, I have 
@@ -14,7 +16,7 @@ information in key file.
 to base 128 digits represented by characters. 
 -Binary compression is implemented and seems to be functional. Reduces key 
 file size by approx 1/4. 
--Decimal compresion also added - now seems to be working - filesizes reduces by about 1/2 in conjunction with pad compression
+-Decimal compression also added - now seems to be working - filesizes reduces by about 1/2 in conjunction with pad compression
 
 
 May 16, 2017 UPDATE:
