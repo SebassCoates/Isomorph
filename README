@@ -2,7 +2,7 @@ OVERVIEW:
 This project was originally created as an independent final project for the
 course Comp 15 at Tufts University. Since its original submission, I have 
 continued to develop the program. 
-This project utilizes Graph Theory to create a new encryption scheme with a brute force decryption time complexity of N(!). The program reads in a file and converts its bits into an adjacency matrix. It can encrypt the file and generate a key, or it can decrypt the file using a key. The key represents a permutations done to the adjacency matrix (of plaintext) to create an isomorphic graph (ciphertext).
+This project utilizes Graph Theory to create a new encryption scheme with a brute force decryption time complexity of N(!). The program reads in a file and converts its bits into an adjacency matrix. It can encrypt the file and generate a key, or it can decrypt the file using a key. The key represents a permutation done to the adjacency matrix (of plaintext) to create an isomorphic graph (ciphertext).
 
 ****************************************************************************
 
