@@ -1,7 +1,0 @@
-this file contains 
-
-	some random text
-
-I hope it decrypts
-		properly lol.
-
